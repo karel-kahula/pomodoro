@@ -1,12 +1,25 @@
 #!/bin/sh
 
 PIDFile=/tmp/pomodoro.pid
+pomoFile=/tmp/pomodoro
 interval=1500
 
+
+cleanUp() {
+    if [ -e $pomoFile ]; then
+        rm $pomoFile
+    fi
+}
+
+endPomo() {
+    osascript -e 'display notification "ding" with title "pomodoro" sound name "default"'
+    cleanUp
+}
+
 startPomo() {
-    (sleep $interval; osascript -e 'display notification "ding" with title "pomodoro" sound name "default"')&
+    (sleep $interval; endPomo)&
     echo $! > $PIDFile
-    echo "$(date "+%H:%M") -> $(date -v +${interval}S "+%H:%M")"
+    echo "$(date '+%H:%M') -> $(date -v +${interval}S '+%H:%M')" > $pomoFile
 }
 
 stopPomo() {
@@ -18,19 +31,30 @@ stopPomo() {
         fi
         rm $PIDFile
     fi
+    cleanUp
+}
+
+reportPomo() {
+    if [ -e $pomoFile ]; then
+        cat $pomoFile
+    fi
 }
 
 printUsage() {
-    echo "Usage: pomodoro [start|stop]"
+    echo "Usage: pomodoro [start|stop|status]"
     exit 1
 }
 
 if [ "$1" = "start" ]; then
     stopPomo
     startPomo
+    reportPomo
     exit
 elif [ "$1" = "stop" ]; then
     stopPomo
+    exit
+elif [ "$1" = "status" ]; then
+    reportPomo
     exit
 fi
 
