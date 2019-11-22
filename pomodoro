@@ -1,0 +1,37 @@
+#!/bin/sh
+
+PIDFile=/tmp/pomodoro.pid
+interval=1500
+
+startPomo() {
+    (sleep $interval; osascript -e 'display notification "ding" with title "pomodoro" sound name "default"')&
+    echo $! > $PIDFile
+    echo "$(date "+%H:%M") -> $(date -v +${interval}S "+%H:%M")"
+}
+
+stopPomo() {
+    if [ -e $PIDFile ]; then
+        pomoPID=$(cat $PIDFile)
+        checkPID=$(ps -ef | grep pomodoro | grep --invert-match grep | awk '{print $2}')
+        if (echo "$checkPID" | fgrep --silent --word-regexp "$pomoPID"); then
+            kill -TERM $pomoPID
+        fi
+        rm $PIDFile
+    fi
+}
+
+printUsage() {
+    echo "Usage: pomodoro [start|stop]"
+    exit 1
+}
+
+if [ "$1" = "start" ]; then
+    stopPomo
+    startPomo
+    exit
+elif [ "$1" = "stop" ]; then
+    stopPomo
+    exit
+fi
+
+printUsage
