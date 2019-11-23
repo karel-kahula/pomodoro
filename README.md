@@ -1,4 +1,4 @@
-# Pomodoro
+# 🍅
 A lightweight Pomodoro script. It's a 25 minute kitchen timer.
 
 ## To-Do
