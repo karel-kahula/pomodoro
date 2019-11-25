@@ -12,7 +12,7 @@ cleanUp() {
 }
 
 endPomo() {
-    osascript -e 'display notification "ding" with title "pomodoro" sound name "default"'
+    osascript -e 'display notification "ding" with title "🍅" sound name "default"'
     cleanUp
 }
 
