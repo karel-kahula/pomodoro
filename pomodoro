@@ -25,7 +25,7 @@ startPomo() {
 stopPomo() {
     if [ -e $PIDFile ]; then
         pomoPID=$(cat $PIDFile)
-        checkPID=$(ps -ef | grep pomodoro | grep --invert-match grep | awk '{print $2}')
+        checkPID=$(pgrep -f "pomodoro start")
         if (echo "$checkPID" | fgrep --silent --word-regexp "$pomoPID"); then
             kill -TERM $pomoPID
         fi
