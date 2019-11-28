@@ -3,7 +3,7 @@
 PIDFile=/tmp/pomodoro.pid
 pomoFile=/tmp/pomodoro
 interval=1500
-
+winderTicks=12
 
 cleanUp() {
     if [ -e $pomoFile ]; then
@@ -16,7 +16,7 @@ endPomo() {
     cleanUp
 }
 
-startPomo() {
+initPomo() {
     (sleep $interval; endPomo)&
     echo $! > $PIDFile
     echo "$(date '+%H:%M') -> $(date -v +${interval}S '+%H:%M')" > $pomoFile
@@ -40,21 +40,44 @@ reportPomo() {
     fi
 }
 
+windPomo() {
+    inputCount=0
+    prompt="Wind-up the timer: "
+    while IFS= read -p "$prompt" -r -s -n 1 char; do
+        inputCount=$(expr $inputCount + 1)
+
+        if [ $inputCount -gt $winderTicks ] || [ $inputCount -eq $winderTicks ]; then
+            break
+        fi
+
+        prompt="*"
+    done
+    echo
+}
+
 printUsage() {
-    echo "Usage: pomodoro [start|stop|status]"
+    echo "Usage: pomodoro [wind|start|stop|status]"
     exit 1
 }
 
-if [ "$1" = "start" ]; then
+startPomo() {
     stopPomo
-    startPomo
+    initPomo
     reportPomo
+}
+
+if [ "$1" = "start" ]; then
+    startPomo
     exit
 elif [ "$1" = "stop" ]; then
     stopPomo
     exit
 elif [ "$1" = "status" ]; then
     reportPomo
+    exit
+elif [ "$1" = "wind" ]; then
+    windPomo
+    startPomo
     exit
 fi
 
