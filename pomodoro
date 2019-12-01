@@ -16,6 +16,7 @@ cleanUp() {
 }
 
 endPomo() {
+    # todo: make this a little friendlier to non-mac users...
     osascript -e 'display notification "ding" with title "🍅" sound name "default"'
     cleanUp
 }
@@ -65,31 +66,43 @@ windPomo() {
     echo
 }
 
-printUsage() {
-    echo "Usage: $scriptName [help|start|status|stop|wind]"
-    exit 1
-}
-
 printHelp() {
     echo "$scriptName - It's a 25 minute kitchen timer"
     echo
-    echo "$scriptName [options] [command]"
+    echo "usage:"
+    echo "$scriptName COMMAND [<options>]"
     echo
     echo "commands:"
-    echo "h, -h, --help         Show this help message"
-    echo "b, begin, start       Start the Pomodoro timer"
-    echo "e, end, stop          Stop the Pomodoro timer"
-    echo "w, wind               Start the Pomodoro by winding it up (mash some keys)"
-    echo "s, status             Show current Pomodor session start and end times"
+    echo "h, -h, --help"
+    echo "      Show this help message"
+    echo "b, begin, start"
+    echo "      Start the Pomodoro timer"
+    echo "e, end, stop"
+    echo "      Stop the Pomodoro timer"
+    echo "w, wind"
+    echo "      Start the Pomodoro by winding it up (mash some keys)"
+    echo "s, status"
+    echo "      Show current Pomodoro session start and end times"
     echo
     echo "options:"
-    echo "t, time, -t, --time   Set the Pomodoro timer in minutes"
+    echo "-t <number>, --time <number>"
+    echo "      Set the Pomodoro timer in minutes"
 }
 
 startPomo() {
     stopPomo
     initPomo
     reportPomo
+}
+
+setInterval() {
+    numberRe='^[0-9]+$'
+    if test $1 && [[ $1 =~  $numberRe ]]; then
+        interval=$(expr $1 \* 60)
+    else
+        printHelp
+        exit 1
+    fi
 }
 
 while test $# -gt 0; do
@@ -115,15 +128,9 @@ while test $# -gt 0; do
         doStartPomo=true
         shift
     ;;
-    t|time|-t|--time)
+    -t|--time)
         shift
-        numberRe='^[0-9]+$'
-        if test $1 && [[ $1 =~  $numberRe ]]; then
-            interval=$(expr $1 \* 60)
-        else
-            printUsage
-            exit 1
-        fi
+        setInterval "$@"
         shift
     ;;
     *)
@@ -141,5 +148,5 @@ if [ "$doStartPomo" = true ]; then
     exit 0
 fi
 
-printUsage
+printHelp
 exit 1
