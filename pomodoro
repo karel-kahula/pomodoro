@@ -1,10 +1,13 @@
 #!/bin/bash
+set -e
 
 PIDFile=/tmp/pomodoro.pid
-pomoFile=/tmp/pomodoro
+doStartPomo=false
+doWindPomo=false
 interval=1500
-winderTicks=12
+pomoFile=/tmp/pomodoro
 scriptName=$(basename $0)
+winderTicks=12
 
 cleanUp() {
     if [ -e $pomoFile ]; then
@@ -73,11 +76,14 @@ printHelp() {
     echo "$scriptName [options] [command]"
     echo
     echo "commands:"
-    echo "h, -h, --help     Show this help message"
-    echo "b, begin, start   Start the Pomodoro timer"
-    echo "e, end, stop      Stop the Pomodoro timer"
-    echo "w, wind           Start the Pomodoro by winding it up (mash some keys)"
-    echo "s, status         Show current Pomodor session start and end times"
+    echo "h, -h, --help         Show this help message"
+    echo "b, begin, start       Start the Pomodoro timer"
+    echo "e, end, stop          Stop the Pomodoro timer"
+    echo "w, wind               Start the Pomodoro by winding it up (mash some keys)"
+    echo "s, status             Show current Pomodor session start and end times"
+    echo
+    echo "options:"
+    echo "t, time, -t, --time   Set the Pomodoro timer in minutes"
 }
 
 startPomo() {
@@ -93,8 +99,8 @@ while test $# -gt 0; do
         exit 0
     ;;
     b|begin|start)
-        startPomo
-        exit 0
+        doStartPomo=true
+        shift
     ;;
     s|status)
         reportPomo
@@ -105,15 +111,35 @@ while test $# -gt 0; do
         exit 0
     ;;
     w|wind)
-        windPomo
-        startPomo
-        exit 0
+        doWindPomo=true
+        doStartPomo=true
+        shift
+    ;;
+    t|time|-t|--time)
+        shift
+        numberRe='^[0-9]+$'
+        if test $1 && [[ $1 =~  $numberRe ]]; then
+            interval=$(expr $1 \* 60)
+        else
+            printUsage
+            exit 1
+        fi
+        shift
     ;;
     *)
         break
     ;;
     esac
 done
+
+if [ "$doWindPomo" = true ]; then
+    windPomo
+fi
+
+if [ "$doStartPomo" = true ]; then
+    startPomo
+    exit 0
+fi
 
 printUsage
 exit 1
