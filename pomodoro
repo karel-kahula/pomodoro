@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PIDFile=/tmp/pomodoro.pid
 pomoFile=/tmp/pomodoro
@@ -17,9 +17,15 @@ endPomo() {
 }
 
 initPomo() {
+    startTime=$(date '+%H:%M')
+    if date -v -1d > /dev/null 2>&1; then #BSD date
+        endTime=$(date -v +${interval}S '+%H:%M')
+    else # Linux date
+        endTime=$(date --date="+${interval} seconds" '+%H:%M')
+    fi
     (sleep $interval; endPomo)&
     echo $! > $PIDFile
-    echo "$(date '+%H:%M') -> $(date -v +${interval}S '+%H:%M')" > $pomoFile
+    echo "$startTime -> $endTime" > $pomoFile
 }
 
 stopPomo() {
@@ -58,6 +64,19 @@ windPomo() {
 printUsage() {
     echo "Usage: pomodoro [wind|start|stop|status]"
     exit 1
+}
+
+printHelp() {
+    echo "$scriptName - It's a 25 minute kitchen timer"
+    echo
+    echo "$scriptName [options] [command]"
+    echo
+    echo "commands:"
+    echo "h, -h, --help     Show this help message"
+    echo "b, begin, start   Start the Pomodoro timer"
+    echo "e, end, stop      Stop the Pomodoro timer"
+    echo "w, wind           Start the Pomodoro by winding it up (mash some keys)"
+    echo "s, status         Show current Pomodor session start and end times"
 }
 
 startPomo() {
