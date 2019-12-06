@@ -55,7 +55,7 @@ windPomo() {
     inputCount=0
     prompt="Wind-up the timer: "
     while IFS= read -p "$prompt" -r -s -n 1 char; do
-        inputCount=$(expr $inputCount + 1)
+        inputCount=$(dc <<< "$inputCount 1 + p")
 
         if [ $inputCount -gt $winderTicks ] || [ $inputCount -eq $winderTicks ]; then
             break
@@ -98,7 +98,7 @@ startPomo() {
 setInterval() {
     numberRe='^[0-9]+$'
     if test $1 && [[ $1 =~  $numberRe ]]; then
-        interval=$(expr $1 \* 60)
+        interval=$(dc <<< "$1 60 * p")
     else
         printHelp
         exit 1
