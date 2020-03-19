@@ -28,6 +28,14 @@ options:
       Set the Pomodoro timer in minutes
 ```
 
+## install
+
+`make install`
+
+## uninstall
+
+`make uninstall`
+
 ## Known Issues
 - If mashing hard enough, the winder will show extra characters other than `*`.
 - Putting your computer to sleep will pause the pomodoro timer.
