@@ -1,9 +1,19 @@
 # 🍅
 A lightweight Pomodoro script.
 
-## Usage
+## Installation (optional)
 
-If you choose, copy this script to a local directory on your computer and use it from there. Basic usage after that is:
+```
+make install
+```
+
+## Uninstallation
+
+```
+make uninstall
+```
+
+## Usage
 
 ```
 pomodoro COMMAND [<options>]
