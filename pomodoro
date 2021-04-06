@@ -48,6 +48,8 @@ stopPomo() {
 reportPomo() {
     if [ -e $pomoFile ]; then
         cat $pomoFile
+	else
+		exit 1
     fi
 }
 
