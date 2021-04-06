@@ -69,7 +69,7 @@ windPomo() {
 }
 
 printHelp() {
-    echo "$scriptName - It's a 25 minute kitchen timer"
+    echo "$scriptName - 🍅 - It's a 25 minute kitchen timer"
     echo
     echo "usage:"
     echo "$scriptName COMMAND [<options>]"
