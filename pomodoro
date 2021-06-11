@@ -16,8 +16,13 @@ cleanUp() {
 }
 
 endPomo() {
-    # todo: make this a little friendlier to non-mac users...
-    osascript -e 'display notification "ding" with title "🍅" sound name "default"'
+
+	if [ "$(uname)" == "Darwin" ]; then
+		osascript -e 'display notification "ding" with title "🍅" sound name "default"'
+	else
+		notify-send -u critical "🍅"
+	fi
+
     cleanUp
 }
 
