@@ -25,6 +25,7 @@ endPomo() {
 }
 
 initPomo() {
+
     startTime=$(date '+%H:%M')
     if date -v -1d > /dev/null 2>&1; then #BSD date
         endTime=$(date -v +${interval}S '+%H:%M')
@@ -39,7 +40,7 @@ initPomo() {
 stopPomo() {
     if [ -e $PIDFile ]; then
         pomoPID=$(cat $PIDFile)
-        checkPID=$(pgrep -f "$scriptName")
+        checkPID=$(pgrep -f "$scriptName") || true
         if (echo "$checkPID" | fgrep --silent --word-regexp "$pomoPID"); then
             kill -TERM $pomoPID
         fi
