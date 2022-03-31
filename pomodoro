@@ -13,6 +13,9 @@ cleanUp() {
     if [ -e $pomoFile ]; then
         rm $pomoFile
     fi
+    if [ -e $PIDFile ]; then
+      rm $PIDFile
+    fi
 }
 
 endPomo() {
