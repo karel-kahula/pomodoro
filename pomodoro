@@ -2,7 +2,7 @@
 set -e
 
 PIDFile=/tmp/pomodoro.pid
-doStartPomo=false
+doBeginPomo=false
 doWindPomo=false
 interval=1500
 pomoFile=/tmp/pomodoro
@@ -26,7 +26,7 @@ endPomo() {
 
 initPomo() {
 
-    startTime=$(date '+%H:%M')
+    beginTime=$(date '+%H:%M')
     if date -v -1d > /dev/null 2>&1; then #BSD date
         endTime=$(date -v +${interval}S '+%H:%M')
     else # Linux date
@@ -34,10 +34,10 @@ initPomo() {
     fi
     (sleep $interval; endPomo)&
     echo $! > $PIDFile
-    echo "$startTime -> $endTime" > $pomoFile
+    echo "$beginTime -> $endTime" > $pomoFile
 }
 
-stopPomo() {
+endPomo() {
     if [ -e $PIDFile ]; then
         pomoPID=$(cat $PIDFile)
         checkPID=$(pgrep -f "$scriptName") || true
@@ -81,12 +81,12 @@ printHelp() {
     echo "commands:"
     echo "h, -h, --help"
     echo "      Show this help message"
-    echo "b, begin, start"
-    echo "      Start the Pomodoro timer"
-    echo "e, end, stop"
-    echo "      Stop the Pomodoro timer"
+    echo "b, begin"
+    echo "      Begin the Pomodoro timer"
+    echo "e, end"
+    echo "      End the Pomodoro timer"
     echo "w, wind"
-    echo "      Start the Pomodoro by winding it up (mash some keys)"
+    echo "      Begin the Pomodoro by winding it up (mash some keys)"
     echo "s, status"
     echo "      Show current Pomodoro session start and end times"
     echo
@@ -95,8 +95,8 @@ printHelp() {
     echo "      Set the Pomodoro timer in minutes"
 }
 
-startPomo() {
-    stopPomo
+beginPomo() {
+    endPomo
     initPomo
     reportPomo
 }
@@ -117,21 +117,21 @@ while test $# -gt 0; do
         printHelp
         exit 0
     ;;
-    b|begin|start)
-        doStartPomo=true
+    b|begin)
+        doBeginPomo=true
         shift
     ;;
     s|status)
         reportPomo
         exit 0
     ;;
-    e|end|stop)
-        stopPomo
+    e|end)
+        endPomo
         exit 0
     ;;
     w|wind)
         doWindPomo=true
-        doStartPomo=true
+        doBeginPomo=true
         shift
     ;;
     -t|--time)
@@ -149,8 +149,8 @@ if [ "$doWindPomo" = true ]; then
     windPomo
 fi
 
-if [ "$doStartPomo" = true ]; then
-    startPomo
+if [ "$doBeginPomo" = true ]; then
+    beginPomo
     exit 0
 fi
 
