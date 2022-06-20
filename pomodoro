@@ -18,7 +18,7 @@ cleanUp() {
     fi
 }
 
-endPomo() {
+displayNotification() {
     # todo: make this a little friendlier to non-mac users...
     osascript -e 'display notification "ding" with title "🍅" sound name "default"'
     cleanUp
@@ -32,12 +32,12 @@ initPomo() {
     else # Linux date
         endTime=$(date --date="+${interval} seconds" '+%H:%M')
     fi
-    (sleep $interval; endPomo)&
+    (sleep $interval; displayNotification)&
     echo $! > $PIDFile
     echo "$beginTime -> $endTime" > $pomoFile
 }
 
-endPomo() {
+stopPomo() {
     if [ -e $PIDFile ]; then
         pomoPID=$(cat $PIDFile)
         checkPID=$(pgrep -f "$scriptName") || true
@@ -96,7 +96,7 @@ printHelp() {
 }
 
 beginPomo() {
-    endPomo
+    stopPomo
     initPomo
     reportPomo
 }
@@ -126,7 +126,7 @@ while test $# -gt 0; do
         exit 0
     ;;
     e|end)
-        endPomo
+        stopPomo
         exit 0
     ;;
     w|wind)
