@@ -91,8 +91,8 @@ printHelp() {
     echo "      Show current Pomodoro session start and end times"
     echo
     echo "options:"
-    echo "-b, --break"
-    echo "      Use the pomodoro break time (5 minutes)"
+    echo "-a, --alternate"
+    echo "      Use the pomodoro alternate/break time (5 minutes)"
 
 }
 
