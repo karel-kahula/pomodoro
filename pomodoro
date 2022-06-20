@@ -76,7 +76,7 @@ printHelp() {
     echo "$scriptName - 🍅 - It's a 25 minute kitchen timer"
     echo
     echo "usage:"
-    echo "$scriptName COMMAND [<options>]"
+    echo "$scriptName COMMAND"
     echo
     echo "commands:"
     echo "h, -h, --help"
@@ -89,11 +89,8 @@ printHelp() {
     echo "      Begin the Pomodoro by winding it up (mash some keys)"
     echo "s, status"
     echo "      Show current Pomodoro session start and end times"
-    echo
-    echo "options:"
-    echo "-a, --alternate"
+    echo "a, alternate"
     echo "      Use the pomodoro alternate/break time (5 minutes)"
-
 }
 
 beginPomo() {
@@ -135,7 +132,8 @@ while test $# -gt 0; do
         doBeginPomo=true
         shift
     ;;
-    -a|--alternate)
+    a|alternate)
+        doBeginPomo=true
         setInterval '5'
         shift
     ;;
