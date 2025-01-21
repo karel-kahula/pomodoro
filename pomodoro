@@ -18,14 +18,17 @@ cleanUp() {
     fi
 }
 
-displayNotification() {
-    # todo: make this a little friendlier to non-mac users...
-    osascript -e 'display notification "ding" with title "🍅" sound name "default"'
+endPomo() {
+    displayNotification
     cleanUp
 }
 
-initPomo() {
+displayNotification() {
+    # todo: make this a little friendlier to non-mac users...
+    osascript -e 'display notification "ding" with title "🍅" sound name "default"'
+}
 
+initPomo() {
     beginTime=$(date '+%H:%M')
     if date -v -1d > /dev/null 2>&1; then #BSD date
         endTime=$(date -v +${interval}S '+%H:%M')
@@ -52,9 +55,9 @@ stopPomo() {
 reportPomo() {
     if [ -e $pomoFile ]; then
         cat $pomoFile
-	else
-		exit 1
-    fi
+    else
+      exit 1
+      fi
 }
 
 windPomo() {
