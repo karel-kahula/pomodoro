@@ -35,7 +35,7 @@ initPomo() {
     else # Linux date
         endTime=$(date --date="+${interval} seconds" '+%H:%M')
     fi
-    (sleep $interval; displayNotification)&
+    (sleep $interval; endPomo)&
     echo $! > $PIDFile
     echo "$beginTime -> $endTime" > $pomoFile
 }
