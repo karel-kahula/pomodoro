@@ -57,7 +57,7 @@ reportPomo() {
         cat $pomoFile
     else
       exit 1
-      fi
+    fi
 }
 
 windPomo() {
@@ -97,9 +97,14 @@ printHelp() {
 }
 
 beginPomo() {
-    stopPomo
-    initPomo
-    reportPomo
+    if [ -e $PIDFile ]; then
+      echo "a pomodoro is already running!"
+      reportPomo
+    else
+      stopPomo
+      initPomo
+      reportPomo
+    fi
 }
 
 setInterval() {
