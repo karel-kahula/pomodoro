@@ -61,6 +61,9 @@ reportPomo() {
 }
 
 windPomo() {
+    if pomoIsRunning; then
+      return 1
+    fi
     inputCount=0
     prompt="Wind-up the timer: "
     while IFS= read -p "$prompt" -r -s -n 1 char; do
@@ -96,10 +99,19 @@ printHelp() {
     echo "      Use the pomodoro alternate/break time (5 minutes)"
 }
 
+pomoIsRunning() {
+  if [ -e $PIDFile ]; then
+    echo "a pomodoro is already running!"
+    reportPomo
+    return 0
+  fi
+
+  return 1
+}
+
 beginPomo() {
-    if [ -e $PIDFile ]; then
-      echo "a pomodoro is already running!"
-      reportPomo
+    if pomoIsRunning; then
+      return 1
     else
       stopPomo
       initPomo
