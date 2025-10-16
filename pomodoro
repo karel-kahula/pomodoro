@@ -97,6 +97,8 @@ printHelp() {
     echo "      Show current Pomodoro session start and end times"
     echo "a, alternate"
     echo "      Use the pomodoro alternate/break time (5 minutes)"
+    echo "l, long"
+    echo "      Use the pomodoro long break time (15 minutes)"
 }
 
 pomoIsRunning() {
@@ -155,6 +157,11 @@ while test $# -gt 0; do
     a|alternate)
         doBeginPomo=true
         setInterval '5'
+        shift
+    ;;
+    l|long)
+        doBeginPomo=true
+        setInterval '15'
         shift
     ;;
     -t|--time)
