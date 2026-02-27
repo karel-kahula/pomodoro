@@ -19,25 +19,33 @@ cleanUp() {
 }
 
 endPomo() {
-    displayNotification
+    displayNotification || true
     cleanUp
 }
 
 displayNotification() {
-    # todo: make this a little friendlier to non-mac users...
-    osascript -e 'display notification "ding" with title "🍅" sound name "default"'
+    terminal-notifier -title "🍅 Pomodoro" -message "Time is up!" -sound default
 }
 
 initPomo() {
     beginTime=$(date '+%H:%M')
-    if date -v -1d > /dev/null 2>&1; then #BSD date
-        endTime=$(date -v +${interval}S '+%H:%M')
-    else # Linux date
-        endTime=$(date --date="+${interval} seconds" '+%H:%M')
+    
+    # Try different date command formats
+    if endTime=$(date -v +${interval}S '+%H:%M' 2>/dev/null); then
+        : # BSD date 
+    elif endTime=$(date --date="+${interval} seconds" '+%H:%M' 2>/dev/null); then
+        : # GNU date 
+    else
+        echo "Error: Unable to calculate end time" >&2
+        exit 1
     fi
-    (sleep $interval; endPomo)&
-    echo $! > $PIDFile
-    echo "$beginTime -> $endTime" > $pomoFile
+    
+    {
+      sleep $interval
+      endPomo
+    } &
+    echo $! > "$PIDFile"
+    echo "$beginTime -> $endTime" > "$pomoFile"
 }
 
 stopPomo() {
@@ -53,10 +61,17 @@ stopPomo() {
 }
 
 reportPomo() {
-    if [ -e $pomoFile ]; then
-        cat $pomoFile
+    if [ -e "$pomoFile" ]; then
+        local timeInfo=$(cat "$pomoFile")
+        local startTime=$(echo "$timeInfo" | cut -d' ' -f1)
+        local endTime=$(echo "$timeInfo" | cut -d' ' -f3)
+        echo "🍅 Pomodoro Session"
+        echo "Time now:    $(date '+%H:%M')"
+        echo "Started at:  $startTime"
+        echo "Ends at:     $endTime"
     else
-      exit 1
+        echo "No active Pomodoro session"
+        exit 1
     fi
 }
 
@@ -65,17 +80,26 @@ windPomo() {
       return 1
     fi
     inputCount=0
-    prompt="Wind-up the timer: "
-    while IFS= read -p "$prompt" -r -s -n 1 char; do
-        inputCount=$(dc <<< "$inputCount 1 + p")
+    local bar_size=$winderTicks
+    
+    # Hide the cursor
+    printf "\e[?25l"
+    
+    printf "Wind-up the timer: [%-${bar_size}s]" ""
 
-        if [ $inputCount -gt $winderTicks ] || [ $inputCount -eq $winderTicks ]; then
-            break
+    while [ "$inputCount" -lt "$bar_size" ]; do
+        if read -s -n 1; then
+            ((inputCount++))
+            
+            local hashes=""
+            for ((i=0; i<inputCount; i++)); do hashes+="#"; done
+            
+            printf "\rWind-up the timer: [%-${bar_size}s]" "$hashes"
         fi
-
-        prompt="*"
     done
-    echo
+
+    # Restore cursor and move to next line
+    printf "\e[?25h\n"
 }
 
 printHelp() {
@@ -122,9 +146,9 @@ beginPomo() {
 }
 
 setInterval() {
-    numberRe='^[0-9]+$'
-    if test $1 && [[ $1 =~  $numberRe ]]; then
-        interval=$(dc <<< "$1 60 * p")
+    numberRe='^[0-9.]+$'
+    if [[ -n "$1" && "$1" =~  $numberRe ]]; then
+      interval=$(awk "BEGIN {print int($1 * 60)}")
     else
         printHelp
         exit 1
@@ -166,7 +190,7 @@ while test $# -gt 0; do
     ;;
     -t|--time)
         shift
-        setInterval "$@"
+        setInterval "$1"
         shift
     ;;
     *)
