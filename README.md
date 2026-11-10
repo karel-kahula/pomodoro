@@ -7,6 +7,27 @@ A lightweight Pomodoro script.
 make install
 ```
 
+### Notifications (macOS)
+The end-of-timer toast is sent with [terminal-notifier](https://github.com/julienXX/terminal-notifier)
+(`brew install terminal-notifier`), which needs permission to post notifications.
+`make install` sends a test notification and opens the Notifications settings
+pane if it's blocked (`make check-notify` runs just that check).
+If no toast appears, run it once by hand to check:
+
+```
+terminal-notifier -title "🍅 Pomodoro" -message "test" -sound default
+```
+
+If that prints `Notifications are not allowed for this application`:
+
+1. Register the app with macOS by launching it once:
+   ```
+   open "$(brew --prefix terminal-notifier)/terminal-notifier.app"
+   ```
+2. In **System Settings → Notifications → terminal-notifier**, turn on
+   **Allow Notifications** and set the style to **Banners** or **Alerts**.
+3. Make sure Focus / Do Not Disturb isn't hiding it.
+
 ## Uninstallation
 
 ```
